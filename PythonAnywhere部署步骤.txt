@@ -1,0 +1,63 @@
+PythonAnywhere部署步骤 - 点击验证链接后
+========================================
+
+步骤1：返回PythonAnywhere网站
+----------------------------------------
+1. 验证成功后，浏览器会显示"Email confirmed"或类似提示
+2. 在浏览器地址栏输入：pythonanywhere.com
+3. 点击"Log in"登录
+4. 输入用户名和密码
+
+步骤2：打开控制台
+----------------------------------------
+1. 登录后点击顶部的"Consoles"标签
+2. 点击"Bash"（黑色方块图标）
+3. 会打开一个命令行窗口
+
+步骤3：下载代码
+----------------------------------------
+在命令行中依次输入以下命令（每行按回车）：
+
+cd ~
+git clone https://github.com/CURRY-21/life-management-system.git
+cd life-management-system
+pip install -r requirements.txt --user
+
+步骤4：创建Web应用
+----------------------------------------
+1. 点击顶部的"Web"标签
+2. 点击"Add a new web app"
+3. 选择"Manual configuration"
+4. 选择"Python 3.11"
+5. 点击"Next"
+
+步骤5：配置应用
+----------------------------------------
+1. 在Web应用页面，找到"Code"部分
+2. Source code: 输入 /home/您的用户名/life-management-system
+3. Working directory: 输入 /home/您的用户名/life-management-system
+4. 点击"WSGI configuration file"链接
+5. 删除所有内容，粘贴以下内容：
+
+import sys
+path = '/home/您的用户名/life-management-system'
+if path not in sys.path:
+    sys.path.append(path)
+from web.app import create_app
+application = create_app()
+
+6. 将"您的用户名"替换为您的实际用户名
+7. 点击"Save"
+
+步骤6：启动应用
+----------------------------------------
+1. 返回Web应用页面
+2. 点击"Reload"按钮
+3. 等待几秒钟
+4. 会显示访问地址
+
+访问地址
+----------------------------------------
+您的用户名.pythonanywhere.com
+
+完成！
