@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>搜索</h1>
+    <p class="lead">搜索您的数字资产文件</p>
+
+    <!-- 搜索表单 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            搜索表单
+        </div>
+        <div class="card-body">
+            <form method="GET" class="search-form">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg" name="keyword" placeholder="输入搜索关键词" value="{{ keyword }}" required>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select form-select-lg" name="category">
+                            <option value="">全部分类</option>
+                            <option value="documents" {% if category == 'documents' %}selected{% endif %}>文档</option>
+                            <option value="images" {% if category == 'images' %}selected{% endif %}>图片</option>
+                            <option value="audio" {% if category == 'audio' %}selected{% endif %}>音频</option>
+                            <option value="video" {% if category == 'video' %}selected{% endif %}>视频</option>
+                            <option value="other" {% if category == 'other' %}selected{% endif %}>其他</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 搜索结果 -->
+    {% if keyword %}
+    <div class="card">
+        <div class="card-header">
+            搜索结果
+            <span class="badge bg-primary ms-2">{{ results|length }} 个结果</span>
+        </div>
+        <div class="card-body">
+            {% if results %}
+            <div class="list-group">
+                {% for file in results %}
+                <div class="list-group-item file-item">
+                    <div class="row align-items-center">
+                        <!-- 文件图标 -->
+                        <div class="col-md-1 text-center">
+                            {% if file.category == 'documents' %}
+                            <i class="bi bi-file-text file-icon text-primary"></i>
+                            {% elif file.category == 'images' %}
+                            <i class="bi bi-file-image file-icon text-success"></i>
+                            {% elif file.category == 'audio' %}
+                            <i class="bi bi-file-music file-icon text-warning"></i>
+                            {% elif file.category == 'video' %}
+                            <i class="bi bi-file-video file-icon text-danger"></i>
+                            {% else %}
+                            <i class="bi bi-file-earmark file-icon text-secondary"></i>
+                            {% endif %}
+                        </div>
+
+                        <!-- 文件信息 -->
+                        <div class="col-md-7 file-info">
+                            <h6 class="mb-1">{{ file.original_filename }}</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        大小: {{ (file.file_size / (1024 * 1024))|round(2) }} MB | 
+                                        类型: {{ file.file_type }}
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        上传时间: {{ file.upload_time }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% if file.tags %}
+                            <div class="mt-1">
+                                {% for tag in file.tags %}
+                                <span class="tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 文件操作 -->
+                        <div class="col-md-4 file-actions text-end">
+                            <a href="{{ url_for('view_file', file_id=file.file_id) }}" class="btn btn-sm btn-primary mb-1">
+                                <i class="bi bi-eye"></i> 查看
+                            </a>
+                            <a href="{{ url_for('download_file', file_id=file.file_id) }}" class="btn btn-sm btn-secondary mb-1">
+                                <i class="bi bi-download"></i> 下载
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center text-muted">未找到匹配的文件</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 搜索页面交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 自动聚焦搜索框
+            const searchInput = document.querySelector('input[name="keyword"]');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        });
+    </script>
+{% endblock %}

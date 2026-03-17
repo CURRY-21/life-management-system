@@ -1,0 +1,19 @@
+# 核心依赖
+Flask==3.0.3
+Flask-CORS==4.0.0
+
+# 文件处理依赖
+python-docx==0.8.11
+openpyxl==3.1.2
+
+# 数据库依赖
+SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9
+
+# 工具库
+python-dotenv==1.0.0
+requests==2.31.0
+
+# 生产环境
+waitress==2.1.2
+gunicorn==21.2.0

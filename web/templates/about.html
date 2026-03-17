@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>关于系统</h1>
+    <p class="lead">人生管理系统 - 您的数字资产管理中心</p>
+
+    <!-- 系统介绍 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            系统介绍
+        </div>
+        <div class="card-body">
+            <p class="mb-3">人生管理系统是一个综合性的数字资产管理平台，旨在帮助用户管理和保护个人数字资产，包括文档、图片、音频、视频等各种类型的文件。</p>
+            <p class="mb-3">系统采用现代化的技术架构，提供了直观的Web界面和完整的API接口，支持在各种设备上访问和管理您的数字资产。</p>
+            <p>无论您是需要管理个人文档、整理照片集、归档音频视频资料，还是需要一个安全可靠的数字资产存储解决方案，人生管理系统都能满足您的需求。</p>
+        </div>
+    </div>
+
+    <!-- 核心功能 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            核心功能
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- 功能1 -->
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-cloud-upload-fill text-primary me-2"></i>
+                                多格式文件上传
+                            </h5>
+                            <p class="card-text">支持上传Excel、Word、图片、音频、视频等多种格式的文件，最大支持100MB的文件大小。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能2 -->
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-folder-fill text-success me-2"></i>
+                                智能文件分类
+                            </h5>
+                            <p class="card-text">自动对上传的文件进行分类和整理，方便后续的管理和查找。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能3 -->
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-search text-warning me-2"></i>
+                                强大搜索功能
+                            </h5>
+                            <p class="card-text">支持基于文件名和文件内容的搜索，快速找到您需要的文件。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能4 -->
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-tags-fill text-danger me-2"></i>
+                                标签管理系统
+                            </h5>
+                            <p class="card-text">通过标签对文件进行标记和分类，提高文件管理的灵活性和效率。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能5 -->
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-phone-fill text-info me-2"></i>
+                                移动端适配
+                            </h5>
+                            <p class="card-text">支持在vivo手机等移动设备上访问和使用系统，提供移动端友好的界面。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能6 -->
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-bar-chart-fill text-secondary me-2"></i>
+                                数据统计分析
+                            </h5>
+                            <p class="card-text">提供文件数量、存储空间、分类统计等数据，帮助您了解数字资产的整体情况。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 技术架构 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            技术架构
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- 前端 -->
+                <div class="col-md-6 mb-3">
+                    <h5>前端技术</h5>
+                    <ul class="list-disc ms-4">
+                        <li class="mb-1">HTML5 + CSS3 + JavaScript</li>
+                        <li class="mb-1">Bootstrap 5 响应式框架</li>
+                        <li class="mb-1">Bootstrap Icons 图标库</li>
+                        <li class="mb-1">Jinja2 模板引擎</li>
+                    </ul>
+                </div>
+
+                <!-- 后端 -->
+                <div class="col-md-6 mb-3">
+                    <h5>后端技术</h5>
+                    <ul class="list-disc ms-4">
+                        <li class="mb-1">Python 3.10+</li>
+                        <li class="mb-1">Flask Web框架</li>
+                        <li class="mb-1">SQLite 数据库</li>
+                        <li class="mb-1">RESTful API接口</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- 文件处理 -->
+                <div class="col-md-6 mb-3">
+                    <h5>文件处理</h5>
+                    <ul class="list-disc ms-4">
+                        <li class="mb-1">python-docx (Word文件)</li>
+                        <li class="mb-1">openpyxl + pandas (Excel文件)</li>
+                        <li class="mb-1">Pillow (图片文件)</li>
+                        <li class="mb-1">speechrecognition (音频文件)</li>
+                        <li class="mb-1">opencv-python + moviepy (视频文件)</li>
+                    </ul>
+                </div>
+
+                <!-- 部署 -->
+                <div class="col-md-6 mb-3">
+                    <h5>部署与集成</h5>
+                    <ul class="list-disc ms-4">
+                        <li class="mb-1">本地开发环境</li>
+                        <li class="mb-1">支持部署到云服务器</li>
+                        <li class="mb-1">提供完整的API接口</li>
+                        <li class="mb-1">支持PWA应用模式</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用说明 -->
+    <div class="card">
+        <div class="card-header">
+            使用说明
+        </div>
+        <div class="card-body">
+            <h5>基本操作流程</h5>
+            <ol class="list-decimal ms-4">
+                <li class="mb-2">在"上传文件"页面上传您的数字资产文件</li>
+                <li class="mb-2">系统会自动处理文件并提取相关信息</li>
+                <li class="mb-2">在"文件管理"页面查看和管理已上传的文件</li>
+                <li class="mb-2">使用"搜索"功能快速找到需要的文件</li>
+                <li class="mb-2">在"标签管理"页面管理系统中的标签</li>
+                <li class="mb-2">在"移动端"页面查看如何在vivo手机上使用系统</li>
+            </ol>
+
+            <h5 class="mt-4">注意事项</h5>
+            <ul class="list-disc ms-4">
+                <li class="mb-2">请确保上传的文件符合系统支持的格式和大小要求</li>
+                <li class="mb-2">系统会自动对文件进行分类和元数据提取，但可能无法处理所有特殊格式的文件</li>
+                <li class="mb-2">对于音频和视频文件，系统会尝试提取其中的文本内容，但需要相应的库支持</li>
+                <li class="mb-2">建议定期备份重要的数字资产，以防止意外数据丢失</li>
+                <li class="mb-2">系统默认使用SQLite数据库，对于大量文件的场景，建议迁移到更强大的数据库系统</li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 关于页面交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以添加关于页面的交互功能
+        });
+    </script>
+{% endblock %}

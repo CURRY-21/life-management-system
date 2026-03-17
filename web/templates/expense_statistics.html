@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}花销统计{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">花销统计</h1>
+    
+    <!-- 筛选表单 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ url_for('expense_statistics') }}">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="start_date">开始日期</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="end_date">结束日期</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">筛选</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 总花销 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">总花销</h4>
+            <p class="card-text text-xl font-bold">¥{{ "%.2f"|format(total_expense) }}</p>
+        </div>
+    </div>
+    
+    <!-- 按类别统计 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">按类别统计</h4>
+            {% if category_expenses %}
+            <div class="row">
+                <div class="col-md-6">
+                    <canvas id="categoryChart" height="300"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>类别</th>
+                                <th>金额</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category, amount in category_expenses|dictsort(reverse=true, by='value') %}
+                            <tr>
+                                <td>{{ category }}</td>
+                                <td>¥{{ "%.2f"|format(amount|float) }}</td>
+                            <td>{{ "%.1f"|format(((amount|float) / (total_expense|float)) * 100) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无数据</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 大归类分析 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">大归类分析</h4>
+            {% if category_expenses %}
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>大类别</th>
+                                <th>包含子类</th>
+                                <th>金额</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set big_categories = {
+                                '基本生活': ['餐饮', '交通', '房租'],
+                                '个人消费': ['购物', '娱乐'],
+                                '医疗教育': ['医疗', '教育'],
+                                '礼品支出': ['礼品'],
+                                '个人护理': ['个人护理'],
+                                '财务支出': ['财务']
+                            } %}
+                            {% set sorted_big_categories = [] %}
+                            {% for big_cat, sub_cats in big_categories.items() %}
+                                {% set big_amount = 0 %}
+                                {% for sub_cat in sub_cats %}
+                                    {% if sub_cat in category_expenses %}
+                                        {% set big_amount = big_amount + category_expenses[sub_cat] %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if big_amount > 0 %}
+                                    {% set _ = sorted_big_categories.append({'name': big_cat, 'amount': big_amount, 'sub_cats': sub_cats}) %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for item in sorted_big_categories|sort(reverse=true, attribute='amount') %}
+                                {% set big_cat = item.name %}
+                                {% set big_amount = item.amount %}
+                                {% set sub_cats = item.sub_cats %}
+                                <tr>
+                                    <td>{{ big_cat }}</td>
+                                    <td>
+                                        {% for sub_cat in sub_cats %}
+                                            {% if sub_cat in category_expenses %}
+                                                {{ sub_cat }} {% if not loop.last %}, {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>¥{{ "%.2f"|format(big_amount|float) }}</td>
+                                <td>{{ "%.1f"|format(((big_amount|float) / (total_expense|float)) * 100) }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无数据</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 月度账单分析 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">月度账单分析</h4>
+            {% if category_expenses %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>消费分析</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>总消费：</strong>¥{{ "%.2f"|format(total_expense|float) }}
+                                </li>
+                                <li class="mb-2">
+                                    <strong>平均每日消费：</strong>¥{{ "%.2f"|format((total_expense|float) / (daily_expenses|length if daily_expenses else 1)) }}
+                                </li>
+                                <li class="mb-2">
+                                    <strong>最高消费类别：</strong>
+                                    {% if category_expenses %}
+                                        {% set max_cat = category_expenses | sort(attribute='value', reverse=True) | first %}
+                                        {{ max_cat[0] }} (¥{{ "%.2f"|format(max_cat[1]|float) }})
+                                    {% else %}
+                                        无
+                                    {% endif %}
+                                </li>
+                                <li class="mb-2">
+                                    <strong>消费分布：</strong>
+                                    {% if category_expenses %}
+                                        {% if category_expenses|length <= 3 %}
+                                            消费集中在少数类别
+                                        {% elif category_expenses|length <= 6 %}
+                                            消费分布较为均匀
+                                        {% else %}
+                                            消费类别多样化
+                                        {% endif %}
+                                    {% else %}
+                                        无数据
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无数据</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 按日期统计 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">按日期统计</h4>
+            {% if daily_expenses %}
+            <div class="row">
+                <div class="col-md-12">
+                    <canvas id="dailyChart" height="300"></canvas>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for date, amount in daily_expenses|dictsort(reverse=true, by='value') %}
+                            <tr>
+                                <td>{{ date }}</td>
+                                <td>¥{{ "%.2f"|format(amount|float) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无数据</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 返回按钮 -->
+    <div class="mt-4">
+        <a href="{{ url_for('expenses') }}" class="btn btn-secondary">返回列表</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 按类别统计图表
+    {% if category_expenses %}
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const categoryLabels = {{ category_expenses.keys()|list|tojson }};
+    const categoryData = {{ category_expenses.values()|list|map('float')|list|tojson }};
+    
+    new Chart(categoryCtx, {
+        type: 'pie',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryData,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40',
+                    '#8AC440',
+                    '#FF6B6B'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    // 按日期统计图表
+    {% if daily_expenses %}
+    const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+    const dailyLabels = {{ daily_expenses.keys()|list|tojson }};
+    const dailyData = {{ daily_expenses.values()|list|map('float')|list|tojson }};
+    
+    new Chart(dailyCtx, {
+        type: 'bar',
+        data: {
+            labels: dailyLabels,
+            datasets: [{
+                label: '每日花销',
+                data: dailyData,
+                backgroundColor: '#36A2EB',
+                borderColor: '#36A2EB',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '金额 (元)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: '日期'
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

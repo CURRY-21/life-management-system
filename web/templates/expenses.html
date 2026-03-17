@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}花销记录{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">花销记录</h1>
+    
+    <!-- 筛选表单 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ url_for('expenses') }}">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="start_date">开始日期</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="end_date">结束日期</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="category">类别</label>
+                            <select class="form-control" id="category" name="category">
+                                <option value="">全部类别</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.category_name }}" {% if current_category == cat.category_name %}selected{% endif %}>{{ cat.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">筛选</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 总花销 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">总花销</h4>
+            <p class="card-text text-xl font-bold">¥{{ "%.2f"|format(total_expense) }}</p>
+        </div>
+    </div>
+    
+    <!-- 操作按钮 -->
+    <div class="mb-4">
+        <a href="{{ url_for('add_expense') }}" class="btn btn-success">添加花销</a>
+        <a href="{{ url_for('expense_statistics') }}" class="btn btn-info">查看统计</a>
+        <a href="{{ url_for('expense_categories') }}" class="btn btn-secondary">类别管理</a>
+    </div>
+    
+    <!-- 花销记录列表 -->
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title mb-4">花销记录</h4>
+            {% if expenses %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>时间</th>
+                            <th>金额</th>
+                            <th>类别</th>
+                            <th>描述</th>
+                            <th>输入方式</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense.date }}</td>
+                            <td>{{ expense.time }}</td>
+                            <td>¥{{ "%.2f"|format(expense.amount) }}</td>
+                            <td>{{ expense.category }}</td>
+                            <td>{{ expense.description }}</td>
+                            <td>{{ '手动' if expense.input_method == 'manual' else '语音' }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('delete_expense', expense_id=expense.expense_id) }}" onsubmit="return confirm('确定要删除这条记录吗？')">
+                                    <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无花销记录</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

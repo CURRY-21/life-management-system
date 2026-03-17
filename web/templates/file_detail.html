@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>文件详情</h1>
+
+    <!-- 文件信息卡片 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            文件信息
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- 文件图标 -->
+                <div class="col-md-2 text-center">
+                    {% if file.category == 'documents' %}
+                    <i class="bi bi-file-text display-3 text-primary"></i>
+                    {% elif file.category == 'images' %}
+                    <i class="bi bi-file-image display-3 text-success"></i>
+                    {% elif file.category == 'audio' %}
+                    <i class="bi bi-file-music display-3 text-warning"></i>
+                    {% elif file.category == 'video' %}
+                    <i class="bi bi-file-video display-3 text-danger"></i>
+                    {% else %}
+                    <i class="bi bi-file-earmark display-3 text-secondary"></i>
+                    {% endif %}
+                </div>
+
+                <!-- 文件基本信息 -->
+                <div class="col-md-10">
+                    <h2 class="mb-3">{{ file.original_filename }}</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>文件ID:</strong> {{ file.file_id }}</p>
+                            <p><strong>文件大小:</strong> {{ file.file_size_formatted }}</p>
+                            <p><strong>文件类型:</strong> {{ file.file_type }}</p>
+                            <p><strong>文件分类:</strong> {{ file.category }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>上传时间:</strong> {{ file.upload_time }}</p>
+                            <p><strong>最后修改:</strong> {{ file.last_modified }}</p>
+                            <p><strong>存储路径:</strong> {{ file.storage_path }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件操作 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            文件操作
+        </div>
+        <div class="card-body">
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('download_file', file_id=file.file_id) }}" class="btn btn-primary">
+                    <i class="bi bi-download"></i> 下载文件
+                </a>
+                <form action="{{ url_for('delete_file', file_id=file.file_id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除这个文件吗？');">
+                        <i class="bi bi-trash"></i> 删除文件
+                    </button>
+                </form>
+                <a href="{{ url_for('files') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 标签管理 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            标签管理
+        </div>
+        <div class="card-body">
+            <!-- 现有标签 -->
+            <div class="mb-3">
+                <h6>现有标签:</h6>
+                {% if file.tags %}
+                <div>
+                    {% for tag in file.tags %}
+                    <span class="tag">
+                        {{ tag }}
+                        <form action="{{ url_for('remove_file_tag', file_id=file.file_id, tag_name=tag) }}" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger p-0 px-1" onclick="return confirm('确定要移除这个标签吗？');">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </form>
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">暂无标签</p>
+                {% endif %}
+            </div>
+
+            <!-- 添加标签 -->
+            <div>
+                <h6>添加标签:</h6>
+                <form action="{{ url_for('add_file_tag', file_id=file.file_id) }}" method="POST">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="tag_name" placeholder="输入标签名称" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus"></i> 添加
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件元数据 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            文件元数据
+        </div>
+        <div class="card-body">
+            {% if file.metadata %}
+            <pre>{{ file.metadata | tojson(indent=2) }}</pre>
+            {% else %}
+            <p class="text-muted">暂无元数据</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 文件内容预览 -->
+    <div class="card">
+        <div class="card-header">
+            内容预览
+        </div>
+        <div class="card-body">
+            {% if file.content %}
+            <div class="border p-3 bg-light rounded" style="max-height: 400px; overflow-y: auto;">
+                <pre>{{ file.content }}</pre>
+            </div>
+            {% else %}
+            <p class="text-muted">暂无内容预览</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 文件详情页面交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以添加文件详情页面的交互功能
+        });
+    </script>
+{% endblock %}

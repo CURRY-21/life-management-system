@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+
+{% block title %}添加花销记录{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">添加花销记录</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="{{ url_for('add_expense') }}">
+                <div class="mb-4">
+                    <h5>输入方式</h5>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="input_method" id="manual_input" value="manual" checked>
+                        <label class="form-check-label" for="manual_input">手动输入</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="input_method" id="voice_input" value="voice">
+                        <label class="form-check-label" for="voice_input">语音输入</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="input_method" id="text_input" value="text">
+                        <label class="form-check-label" for="text_input">文本解析</label>
+                    </div>
+                </div>
+                
+                <!-- 语音输入区域 -->
+                <div id="voice_input_section" class="mb-4 d-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>语音输入</h6>
+                            <div class="mb-3">
+                                <button type="button" id="start_voice" class="btn btn-primary">开始录音</button>
+                                <button type="button" id="stop_voice" class="btn btn-danger d-none">停止录音</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="voice_result">识别结果</label>
+                                <textarea class="form-control" id="voice_result" rows="3" readonly></textarea>
+                            </div>
+                            <button type="button" id="parse_voice" class="btn btn-success">解析并填充</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文本解析输入区域 -->
+                <div id="text_input_section" class="mb-4 d-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>文本解析</h6>
+                            <div class="form-group">
+                                <label for="text_input_area">粘贴文本</label>
+                                <textarea class="form-control" id="text_input_area" rows="5" placeholder="请粘贴包含花销信息的文本，例如：\n2026年3月1日 午餐 35元\n2026年3月2日 交通 10元\n2026年3月3日 购物 150元"></textarea>
+                            </div>
+                            <button type="button" id="parse_text" class="btn btn-success">解析文本</button>
+                            <div class="mt-3">
+                                <h7>解析结果</h7>
+                                <div id="parse_result" class="mt-2"></div>
+                                <div id="batch_operations" class="mt-3 d-none">
+                                    <button type="button" id="fill_all" class="btn btn-success">全部填充</button>
+                                    <button type="button" id="save_all" class="btn btn-primary ml-2">批量保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 手动输入区域 -->
+                <div id="manual_input_section">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="amount">金额</label>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" placeholder="请输入金额">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="category">类别</label>
+                            <select class="form-control" id="category" name="category">
+                                <option value="">请选择类别</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.category_name }}">{{ cat.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="date">日期</label>
+                            <input type="date" class="form-control" id="date" name="date" value="{{ today }}">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="time">时间</label>
+                            <input type="time" class="form-control" id="time" name="time" value="{{ now }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">描述</label>
+                        <input type="text" class="form-control" id="description" name="description" placeholder="请输入描述">
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <a href="{{ url_for('expenses') }}" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 切换输入方式
+    document.getElementById('manual_input').addEventListener('change', function() {
+        document.getElementById('manual_input_section').classList.remove('d-none');
+        document.getElementById('voice_input_section').classList.add('d-none');
+        document.getElementById('text_input_section').classList.add('d-none');
+    });
+    
+    document.getElementById('voice_input').addEventListener('change', function() {
+        document.getElementById('manual_input_section').classList.add('d-none');
+        document.getElementById('voice_input_section').classList.remove('d-none');
+        document.getElementById('text_input_section').classList.add('d-none');
+    });
+    
+    document.getElementById('text_input').addEventListener('change', function() {
+        document.getElementById('manual_input_section').classList.add('d-none');
+        document.getElementById('voice_input_section').classList.add('d-none');
+        document.getElementById('text_input_section').classList.remove('d-none');
+    });
+    
+    // 语音输入功能（模拟）
+    document.getElementById('start_voice').addEventListener('click', function() {
+        this.classList.add('d-none');
+        document.getElementById('stop_voice').classList.remove('d-none');
+        document.getElementById('voice_result').value = '正在录音...';
+    });
+    
+    document.getElementById('stop_voice').addEventListener('click', function() {
+        this.classList.add('d-none');
+        document.getElementById('start_voice').classList.remove('d-none');
+        // 模拟语音识别结果
+        document.getElementById('voice_result').value = '今天中午吃饭花了35元，买饮料花了10元';
+    });
+    
+    // 解析语音结果
+    document.getElementById('parse_voice').addEventListener('click', function() {
+        const voiceText = document.getElementById('voice_result').value;
+        // 简单的解析逻辑（实际项目中可能需要更复杂的NLP处理）
+        const amountMatch = voiceText.match(/(\d+(\.\d+)?)元/g);
+        if (amountMatch) {
+            const amount = amountMatch[0].replace('元', '');
+            document.getElementById('amount').value = amount;
+        }
+        
+        // 自动填充类别（根据关键词）
+        const categoryKeywords = {
+            '吃饭': '餐饮',
+            '饮料': '餐饮',
+            '交通': '交通',
+            '购物': '购物',
+            '电影': '娱乐',
+            '医疗': '医疗',
+            '学费': '教育',
+            '房租': '房租'
+        };
+        
+        for (const [keyword, category] of Object.entries(categoryKeywords)) {
+            if (voiceText.includes(keyword)) {
+                document.getElementById('category').value = category;
+                break;
+            }
+        }
+        
+        // 显示手动输入区域并填充日期时间
+        document.getElementById('manual_input_section').classList.remove('d-none');
+        document.getElementById('voice_input_section').classList.add('d-none');
+        document.getElementById('manual_input').checked = true;
+    });
+    
+    // 文本解析功能
+    document.getElementById('parse_text').addEventListener('click', function() {
+        const text = document.getElementById('text_input_area').value;
+        if (!text) {
+            alert('请输入文本');
+            return;
+        }
+        
+        // 解析文本
+        const expenses = parseExpenseText(text);
+        
+        // 显示解析结果
+        const resultDiv = document.getElementById('parse_result');
+        if (expenses.length > 0) {
+            let html = '<div class="alert alert-success">解析到 ' + expenses.length + ' 条花销记录：</div>';
+            html += '<table class="table table-striped mt-2">';
+            html += '<thead><tr><th>日期</th><th>描述</th><th>金额</th><th>操作</th></tr></thead>';
+            html += '<tbody>';
+            
+            expenses.forEach((expense, index) => {
+                html += '<tr>';
+                html += '<td>' + expense.date + '</td>';
+                html += '<td>' + expense.description + '</td>';
+                html += '<td>¥' + expense.amount + '</td>';
+                html += '<td><button type="button" class="btn btn-primary btn-sm" onclick="fillExpenseForm(' + index + ')">填充</button></td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            resultDiv.innerHTML = html;
+            
+            // 存储解析结果
+            window.parsedExpenses = expenses;
+            
+            // 显示批量操作按钮
+            document.getElementById('batch_operations').classList.remove('d-none');
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-warning">未解析到花销记录，请检查输入格式</div>';
+            // 隐藏批量操作按钮
+            document.getElementById('batch_operations').classList.add('d-none');
+        }
+    });
+    
+    // 填充表单
+    window.fillExpenseForm = function(index) {
+        const expense = window.parsedExpenses[index];
+        if (expense) {
+            // 确保金额被正确填充
+            const amountInput = document.getElementById('amount');
+            amountInput.value = expense.amount;
+            console.log('填充金额:', expense.amount);
+            
+            document.getElementById('description').value = expense.description;
+            document.getElementById('date').value = expense.date;
+            
+            // 自动匹配类别
+            const categoryKeywords = {
+                '餐饮': ['餐', '饭', '午餐', '晚餐', '早餐', '外卖', '餐厅', '食堂', '买吃的', '啤酒'],
+                '交通': ['交通', '打车', '公交', '地铁', '加油', '停车', '客车', '火车票', '返程火车票'],
+                '购物': ['购物', '买', '超市', '商场', '淘宝', '京东', '饮用水'],
+                '娱乐': ['娱乐', '电影', '游戏', 'KTV', '旅游'],
+                '医疗': ['医疗', '医院', '药店', '药'],
+                '教育': ['教育', '学费', '培训', '书本', '学习'],
+                '房租': ['房租', '房费', '住宿'],
+                '其他': ['送礼', '剪发']
+            };
+            
+            for (const [category, keywords] of Object.entries(categoryKeywords)) {
+                for (const keyword of keywords) {
+                    if (expense.description.includes(keyword)) {
+                        document.getElementById('category').value = category;
+                        break;
+                    }
+                }
+                if (document.getElementById('category').value) {
+                    break;
+                }
+            }
+            
+            // 如果没有匹配到类别，设置为其他
+            if (!document.getElementById('category').value) {
+                document.getElementById('category').value = '其他';
+            }
+            
+            // 切换到手动输入模式
+            document.getElementById('manual_input').checked = true;
+            document.getElementById('manual_input_section').classList.remove('d-none');
+            document.getElementById('text_input_section').classList.add('d-none');
+            
+            // 显示填充成功提示
+            alert('填充成功！金额：' + expense.amount + '，描述：' + expense.description);
+        }
+    };
+    
+    // 解析花销文本
+    function parseExpenseText(text) {
+        const expenses = [];
+        const lines = text.split('\n');
+        
+        // 获取当前日期
+        const today = new Date().toISOString().split('T')[0];
+        
+        // 日期正则表达式
+        const dateRegex = /(\d{4})[年\-](\d{1,2})[月\-](\d{1,2})[日]?/;
+        // 金额正则表达式（支持多种格式）
+        const amountRegex = /(\d+(\.\d+)?)/;
+        
+        lines.forEach(line => {
+            line = line.trim();
+            if (!line) return;
+            
+            // 匹配日期
+            let date = today; // 默认使用当前日期
+            const dateMatch = line.match(dateRegex);
+            if (dateMatch) {
+                const year = dateMatch[1];
+                const month = dateMatch[2].padStart(2, '0');
+                const day = dateMatch[3].padStart(2, '0');
+                date = year + '-' + month + '-' + day;
+            }
+            
+            // 匹配金额（支持"项目：金额"格式）
+            const parts = line.split('：'); // 注意是中文冒号
+            if (parts.length >= 2) {
+                const description = parts[0].trim();
+                const amountStr = parts[1].trim();
+                const amountMatch = amountStr.match(amountRegex);
+                if (amountMatch) {
+                    const amount = amountMatch[1];
+                    expenses.push({ date, description, amount });
+                }
+            } else {
+                // 尝试匹配其他格式
+                const amountMatch = line.match(amountRegex);
+                if (amountMatch) {
+                    const amount = amountMatch[1];
+                    let description = line.replace(amountMatch[0], '').trim();
+                    if (!description) {
+                        description = '无';
+                    }
+                    expenses.push({ date, description, amount });
+                }
+            }
+        });
+        
+        return expenses;
+    }
+    
+    // 批量操作功能
+    document.getElementById('fill_all').addEventListener('click', function() {
+        if (window.parsedExpenses && window.parsedExpenses.length > 0) {
+            // 显示所有解析结果的详细信息
+            let message = '将批量保存以下记录：\n';
+            window.parsedExpenses.forEach((expense, index) => {
+                message += (index + 1) + '. ' + expense.date + ' ' + expense.description + ' ¥' + expense.amount + '\n';
+            });
+            
+            if (confirm(message)) {
+                // 直接调用批量保存功能
+                fetch('/api/expenses/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(window.parsedExpenses)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('批量保存完成！共保存 ' + data.saved_count + ' 条记录');
+                        // 清空解析结果
+                        document.getElementById('text_input_area').value = '';
+                        document.getElementById('parse_result').innerHTML = '';
+                        document.getElementById('batch_operations').classList.add('d-none');
+                    } else {
+                        alert('批量保存失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('批量保存失败：' + error.message);
+                });
+            }
+        }
+    });
+    
+    document.getElementById('save_all').addEventListener('click', function() {
+        if (window.parsedExpenses && window.parsedExpenses.length > 0) {
+            if (confirm('确定要批量保存所有 ' + window.parsedExpenses.length + ' 条记录吗？')) {
+                // 批量保存逻辑
+                fetch('/api/expenses/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(window.parsedExpenses)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('批量保存完成！共保存 ' + data.saved_count + ' 条记录');
+                        // 清空解析结果
+                        document.getElementById('text_input_area').value = '';
+                        document.getElementById('parse_result').innerHTML = '';
+                        document.getElementById('batch_operations').classList.add('d-none');
+                    } else {
+                        alert('批量保存失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('批量保存失败：' + error.message);
+                });
+            }
+        }
+    });
+    
+    // 设置默认日期和时间
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        const now = new Date().toTimeString().split(' ')[0].substring(0, 5);
+        document.getElementById('date').value = today;
+        document.getElementById('time').value = now;
+    });
+</script>
+{% endblock %}

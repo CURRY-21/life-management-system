@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}手机端使用指南{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">手机端使用指南</h1>
+    <p class="lead">随时随地记录和分析您的花销</p>
+
+    <!-- 快速开始 -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-phone-fill"></i> 快速开始
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>当前服务器地址：</strong> {{ request.host_url }}
+            </div>
+            
+            <h5 class="mt-3">方法一：直接浏览器访问（推荐）</h5>
+            <ol class="list-group list-group-numbered mb-4">
+                <li class="list-group-item">在手机上打开浏览器（Chrome、Safari、微信浏览器等）</li>
+                <li class="list-group-item">输入地址：<strong>{{ request.host_url }}</strong></li>
+                <li class="list-group-item">无需登录，直接使用记账功能</li>
+                <li class="list-group-item">支持语音输入、文本解析等多种记账方式</li>
+            </ol>
+
+            <h5>方法二：添加到主屏幕（PWA应用）</h5>
+            <ol class="list-group list-group-numbered">
+                <li class="list-group-item">用浏览器打开系统</li>
+                <li class="list-group-item">
+                    <strong>Android/Chrome：</strong> 点击菜单 → "添加到主屏幕"
+                </li>
+                <li class="list-group-item">
+                    <strong>iPhone/Safari：</strong> 点击分享按钮 → "添加到主屏幕"
+                </li>
+                <li class="list-group-item">像使用普通App一样使用，支持离线访问</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- 核心功能 -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <i class="bi bi-wallet-fill"></i> 核心记账功能
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-pencil-square text-primary"></i> 快速记账</h5>
+                            <p class="card-text">支持多种输入方式：</p>
+                            <ul>
+                                <li>手动输入</li>
+                                <li>语音输入</li>
+                                <li>文本解析（复制粘贴）</li>
+                            </ul>
+                            <a href="/expenses/add" class="btn btn-primary btn-sm">立即记账</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-graph-up text-success"></i> 智能分析</h5>
+                            <p class="card-text">自动分类和统计：</p>
+                            <ul>
+                                <li>智能识别花销类别</li>
+                                <li>按类别、日期统计</li>
+                                <li>大归类分析</li>
+                            </ul>
+                            <a href="/expenses/statistics" class="btn btn-success btn-sm">查看统计</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-list-check text-info"></i> 记录管理</h5>
+                            <p class="card-text">查看和管理所有记录：</p>
+                            <ul>
+                                <li>按日期筛选</li>
+                                <li>按类别筛选</li>
+                                <li>修改和删除记录</li>
+                            </ul>
+                            <a href="/expenses" class="btn btn-info btn-sm">查看记录</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-tags text-warning"></i> 自定义类别</h5>
+                            <p class="card-text">管理花销类别：</p>
+                            <ul>
+                                <li>添加自定义类别</li>
+                                <li>删除不需要的类别</li>
+                                <li>智能自动分类</li>
+                            </ul>
+                            <a href="/expenses/categories" class="btn btn-warning btn-sm">管理类别</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用技巧 -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <i class="bi bi-lightbulb-fill"></i> 使用技巧
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="tipsAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                            批量记账技巧
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#tipsAccordion">
+                        <div class="accordion-body">
+                            <p>当您有一大段花销记录时，可以使用文本解析功能：</p>
+                            <ol>
+                                <li>进入"添加花销记录"页面</li>
+                                <li>选择"文本解析"输入方式</li>
+                                <li>粘贴您的花销文本，例如：<br>
+                                    <code>返程火车票：417元<br>
+                                    打车：10元<br>
+                                    早餐：8.65元</code>
+                                </li>
+                                <li>点击"解析文本"</li>
+                                <li>点击"全部填充"批量保存</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                            智能分类说明
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                        <div class="accordion-body">
+                            <p>系统会自动识别以下类别：</p>
+                            <ul>
+                                <li><strong>餐饮：</strong>餐、饭、早餐、午餐、晚餐、外卖、啤酒、烧烤等</li>
+                                <li><strong>交通：</strong>打车、公交、地铁、火车票、客车等</li>
+                                <li><strong>购物：</strong>买、超市、商场、淘宝、京东、饮用水等</li>
+                                <li><strong>礼品：</strong>送礼、礼物、礼品、妇女节等</li>
+                                <li><strong>个人护理：</strong>剪发、理发、美容、护肤等</li>
+                                <li><strong>财务：</strong>借钱、还钱、借、还款等</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                            离线使用说明
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                        <div class="accordion-body">
+                            <p>添加到主屏幕后，应用支持离线访问：</p>
+                            <ul>
+                                <li>首次访问需要联网加载</li>
+                                <li>之后可以在离线状态下查看已加载的页面</li>
+                                <li>记账操作需要网络连接才能保存到服务器</li>
+                                <li>建议在网络良好的环境下使用</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 常见问题 -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-question-circle-fill"></i> 常见问题
+        </div>
+        <div class="card-body">
+            <div class="faq-item mb-3">
+                <h6><strong>Q: 为什么需要在同一WiFi下访问？</strong></h6>
+                <p>A: 因为服务器运行在您的电脑上，手机需要和电脑在同一网络才能访问。您也可以：</p>
+                <ul>
+                    <li>使用电脑开启热点，手机连接热点</li>
+                    <li>使用内网穿透工具（如ngrok）实现外网访问</li>
+                </ul>
+            </div>
+            
+            <div class="faq-item mb-3">
+                <h6><strong>Q: 数据会丢失吗？</strong></h6>
+                <p>A: 数据保存在您电脑的本地数据库中，建议定期备份。系统支持自动备份功能。</p>
+            </div>
+            
+            <div class="faq-item mb-3">
+                <h6><strong>Q: 支持多设备同步吗？</strong></h6>
+                <p>A: 目前需要在同一网络下访问。如需远程访问，建议部署到云服务器。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快捷操作 -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <i class="bi bi-lightning-fill"></i> 快捷操作
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-6 col-md-3 mb-3">
+                    <a href="/expenses/add" class="btn btn-outline-primary w-100 py-3">
+                        <i class="bi bi-plus-circle fs-3 d-block mb-2"></i>
+                        记账
+                    </a>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                    <a href="/expenses" class="btn btn-outline-success w-100 py-3">
+                        <i class="bi bi-list-ul fs-3 d-block mb-2"></i>
+                        记录
+                    </a>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                    <a href="/expenses/statistics" class="btn btn-outline-info w-100 py-3">
+                        <i class="bi bi-pie-chart fs-3 d-block mb-2"></i>
+                        统计
+                    </a>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                    <a href="/" class="btn btn-outline-secondary w-100 py-3">
+                        <i class="bi bi-house fs-3 d-block mb-2"></i>
+                        首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 复制地址到剪贴板
+    function copyAddress() {
+        const address = '{{ request.host_url }}';
+        navigator.clipboard.writeText(address).then(function() {
+            alert('地址已复制到剪贴板！');
+        }).catch(function(err) {
+            console.error('复制失败:', err);
+        });
+    }
+</script>
+{% endblock %}

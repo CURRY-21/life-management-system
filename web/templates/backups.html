@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>备份管理</h1>
+    <p class="lead">管理您的数字资产备份，确保数据安全</p>
+
+    <!-- 备份统计信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            备份统计信息
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- 总备份数 -->
+                <div class="col-md-3 stats-card">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="stats-value">{{ statistics.total_backups }}</div>
+                            <div class="stats-label">总备份数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 总备份大小 -->
+                <div class="col-md-3 stats-card">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="stats-value">
+                                {% if statistics.total_size < 1024 %}
+                                    {{ statistics.total_size }} B
+                                {% elif statistics.total_size < 1024 * 1024 %}
+                                    {{ "%.2f"|format(statistics.total_size / 1024) }} KB
+                                {% elif statistics.total_size < 1024 * 1024 * 1024 %}
+                                    {{ "%.2f"|format(statistics.total_size / (1024 * 1024)) }} MB
+                                {% else %}
+                                    {{ "%.2f"|format(statistics.total_size / (1024 * 1024 * 1024)) }} GB
+                                {% endif %}
+                            </div>
+                            <div class="stats-label">总备份大小</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 备份目录 -->
+                <div class="col-md-6 stats-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="stats-label">备份存储目录</h6>
+                            <p class="mb-0">{{ statistics.backup_dir }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建备份 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            创建备份
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('create_backup') }}" method="POST">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">备份描述</label>
+                            <input type="text" class="form-control" id="description" name="description" placeholder="输入备份描述（可选）">
+                        </div>
+                    </div>
+                    <div class="col-md-4 align-self-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-backup-fill"></i> 创建备份
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 备份列表 -->
+    <div class="card">
+        <div class="card-header">
+            备份列表
+            <span class="badge bg-primary ms-2">{{ backups|length }} 个备份</span>
+        </div>
+        <div class="card-body">
+            {% if backups %}
+            <div class="list-group">
+                {% for backup in backups %}
+                <div class="list-group-item file-item">
+                    <div class="row">
+                        <!-- 备份信息 -->
+                        <div class="col-md-7">
+                            <h6 class="mb-1">{{ backup.backup_filename }}</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        大小: 
+                                        {% if backup.size < 1024 %}
+                                            {{ backup.size }} B
+                                        {% elif backup.size < 1024 * 1024 %}
+                                            {{ "%.2f"|format(backup.size / 1024) }} KB
+                                        {% elif backup.size < 1024 * 1024 * 1024 %}
+                                            {{ "%.2f"|format(backup.size / (1024 * 1024)) }} MB
+                                        {% else %}
+                                            {{ "%.2f"|format(backup.size / (1024 * 1024 * 1024)) }} GB
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        时间: {{ backup.timestamp }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% if backup.description %}
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    描述: {{ backup.description }}
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 备份操作 -->
+                        <div class="col-md-5 text-end">
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('download_backup', backup_filename=backup.backup_filename) }}" class="btn btn-sm btn-secondary mb-1">
+                                    <i class="bi bi-download"></i> 下载
+                                </a>
+                                <form action="{{ url_for('restore_backup', backup_filename=backup.backup_filename) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-warning mb-1" onclick="return confirm('确定要恢复此备份吗？当前数据将被覆盖！');">
+                                        <i class="bi bi-arrow-clockwise"></i> 恢复
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('delete_backup', backup_filename=backup.backup_filename) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('确定要删除此备份吗？');">
+                                        <i class="bi bi-trash"></i> 删除
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无备份</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 备份说明 -->
+    <div class="card mt-4">
+        <div class="card-header">
+            备份说明
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    系统会自动创建备份，默认每小时一次
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    备份文件存储在系统的backups目录中
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    恢复备份会覆盖当前所有数据，请谨慎操作
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    建议定期下载备份文件到本地或其他存储设备，以防系统故障
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    备份文件使用ZIP格式压缩，包含系统中的所有数据
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 备份管理页面交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以添加备份管理页面的交互功能
+        });
+    </script>
+{% endblock %}

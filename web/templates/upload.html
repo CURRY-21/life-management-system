@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>文件上传</h1>
+    <p class="lead">上传您的数字资产，包括文档、图片、音频和视频等</p>
+
+    <!-- 文件上传表单 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            上传文件
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="file" class="form-label">选择文件</label>
+                    <input class="form-control" type="file" id="file" name="file" multiple>
+                    <div class="form-text">
+                        支持的文件格式：
+                        <br>文档：TXT, MD, CSV, DOCX, XLSX, XLS, PDF, WPS, ET, DPS
+                        <br>图片：JPG, JPEG, PNG, GIF, BMP
+                        <br>音频：MP3, WAV, OGG, FLAC, M4A
+                        <br>视频：MP4, AVI, MOV, WMV, FLV
+                        <br>最大文件大小：100MB
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-cloud-upload-fill"></i> 上传文件
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 上传提示 -->
+    <div class="card">
+        <div class="card-header">
+            上传提示
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    请确保上传的文件符合系统支持的格式和大小要求
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    系统会自动对文件进行分类和元数据提取
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    上传完成后，您可以在"文件管理"中查看和管理上传的文件
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    对于音频和视频文件，系统会尝试提取其中的文本内容（需要相应的库支持）
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    对于图片文件，系统会尝试使用OCR技术提取其中的文字（需要Tesseract OCR支持）
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 最近上传的文件 -->
+    {% if recent_files %}
+    <div class="card mt-4">
+        <div class="card-header">
+            最近上传的文件
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for file in recent_files[:5] %}
+                <li class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-1">{{ file.original_filename }}</h6>
+                            <small class="text-muted">上传时间: {{ file.upload_time }}</small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{{ url_for('view_file', file_id=file.file_id) }}" class="btn btn-sm btn-primary">查看</a>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 文件上传表单处理
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file');
+            const form = fileInput.closest('form');
+            
+            form.addEventListener('submit', function(e) {
+                // 检查是否选择了文件
+                if (!fileInput.files.length) {
+                    alert('请选择要上传的文件');
+                    e.preventDefault();
+                    return;
+                }
+                
+                // 检查文件大小
+                const maxSize = 100 * 1024 * 1024; // 100MB
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    if (fileInput.files[i].size > maxSize) {
+                        alert(`文件 ${fileInput.files[i].name} 超过最大文件大小限制（100MB）`);
+                        e.preventDefault();
+                        return;
+                    }
+                }
+                
+                // 显示上传中提示
+                alert('文件上传中，请稍候...');
+            });
+        });
+    </script>
+{% endblock %}

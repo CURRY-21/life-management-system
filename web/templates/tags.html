@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>标签管理</h1>
+    <p class="lead">管理系统中的所有标签</p>
+
+    <!-- 标签列表 -->
+    <div class="card">
+        <div class="card-header">
+            标签列表
+            <span class="badge bg-primary ms-2">{{ tags|length }} 个标签</span>
+        </div>
+        <div class="card-body">
+            {% if tags %}
+            <div class="row">
+                {% for tag in tags %}
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="mb-0">{{ tag }}</h6>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ tag }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center text-muted">暂无标签</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 标签使用说明 -->
+    <div class="card mt-4">
+        <div class="card-header">
+            标签使用说明
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    标签用于对文件进行分类和标记，方便后续搜索和管理
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    在文件详情页面可以为文件添加或移除标签
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    标签是全局的，添加后可以在多个文件中重复使用
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    建议使用简洁明了的标签名称，便于识别和管理
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-info-circle text-info"></i> 
+                    未来将支持基于标签的文件筛选和统计功能
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 标签管理页面交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 标签删除确认
+            window.confirmDelete = function(tagName) {
+                if (confirm(`确定要删除标签 "${tagName}" 吗？`)) {
+                    // 这里可以添加删除标签的逻辑
+                    alert(`标签 "${tagName}" 将被删除`);
+                }
+            };
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>首页</h1>
+    <p class="lead">欢迎使用人生管理系统，您的数字资产管理中心</p>
+
+    <!-- 统计卡片 -->
+    <div class="row mb-4">
+        <!-- 总文件数 -->
+        <div class="col-md-3 stats-card">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stats-value">{{ total_files }}</div>
+                    <div class="stats-label">总文件数</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 总存储空间 -->
+        <div class="col-md-3 stats-card">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stats-value">{{ total_size }}</div>
+                    <div class="stats-label">总存储空间</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文档数量 -->
+        <div class="col-md-3 stats-card">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stats-value">{{ category_stats.get('documents', 0) }}</div>
+                    <div class="stats-label">文档数量</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 媒体文件数量 -->
+        <div class="col-md-3 stats-card">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stats-value">{{ (category_stats.get('images', 0) + category_stats.get('audio', 0) + category_stats.get('video', 0)) }}</div>
+                    <div class="stats-label">媒体文件数量</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分类统计 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            文件分类统计
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for category, count in category_stats.items() %}
+                <div class="col-md-2 mb-2">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ category }}</h5>
+                            <p class="card-text">{{ count }} 个文件</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近上传的文件 -->
+    <div class="card">
+        <div class="card-header">
+            最近上传的文件
+        </div>
+        <div class="card-body">
+            {% if recent_files %}
+            <ul class="list-group">
+                {% for file in recent_files %}
+                <li class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-1">{{ file.original_filename }}</h6>
+                            <small class="text-muted">上传时间: {{ file.upload_time }}</small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{{ url_for('view_file', file_id=file.file_id) }}" class="btn btn-sm btn-primary">查看</a>
+                            <a href="{{ url_for('download_file', file_id=file.file_id) }}" class="btn btn-sm btn-secondary">下载</a>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-center text-muted">暂无上传的文件</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="mt-4">
+        <div class="card">
+            <div class="card-header">
+                快速操作
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('upload_file') }}" class="btn btn-primary btn-block">
+                            <i class="bi bi-cloud-upload-fill"></i> 上传文件
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('files') }}" class="btn btn-secondary btn-block">
+                            <i class="bi bi-folder-fill"></i> 管理文件
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('search') }}" class="btn btn-secondary btn-block">
+                            <i class="bi bi-search"></i> 搜索文件
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('mobile') }}" class="btn btn-secondary btn-block">
+                            <i class="bi bi-phone-fill"></i> 移动端访问
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('人生管理系统首页加载完成');
+        });
+    </script>
+{% endblock %}
